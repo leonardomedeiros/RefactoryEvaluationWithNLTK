@@ -3,7 +3,7 @@
 -- Searchword = 'refactor'
 DECLARE @CreationDateStart datetime = ##CreationDateStart##
 DECLARE @CreationDateEnd datetime = ##CreationDateEnd##
-DECLARE @SearchWord varchar(30)  = ##SearchWord##
+DECLARE @SearchWorld varchar(30)  = ##SearchWord##
 
 SELECT TOP 500 Posts.Id, Title, Score, Body, CreationDate
 FROM Posts
@@ -12,10 +12,8 @@ FROM Posts
 
 WHERE 
 --Posts.Body LIKE 'refactor%' and
---Posts.Title like @SearchWord
-Posts.Title like @SearchWord and
 Posts.CreationDate >= @CreationDateStart and
-Posts.CreationDate <= @CreationDateEnd
-
+Posts.CreationDate <= @CreationDateEnd and
+Posts.Title like @SearchWord
 --CONTAINS(Body, @SearchWord)
 ORDER BY Score DESC

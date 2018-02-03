@@ -1,6 +1,6 @@
--- CreationDateStart =  '01/01/2014'
+-- CreationDateStart =  '01/01/2007'
 -- CreationDateEnd = '12/31/2017'
--- Searchword = 'refactor'
+-- Searchword = 'refactor%'
 DECLARE @CreationDateStart datetime = ##CreationDateStart##
 DECLARE @CreationDateEnd datetime = ##CreationDateEnd##
 DECLARE @SearchWord varchar(30)  = ##SearchWord##
@@ -12,10 +12,8 @@ FROM Posts
 
 WHERE 
 --Posts.Body LIKE 'refactor%' and
---Posts.Title like @SearchWord
-Posts.Title like @SearchWord and
 Posts.CreationDate >= @CreationDateStart and
-Posts.CreationDate <= @CreationDateEnd
-
+Posts.CreationDate <= @CreationDateEnd and
+Posts.Title like @SearchWord
 --CONTAINS(Body, @SearchWord)
 ORDER BY Score DESC
