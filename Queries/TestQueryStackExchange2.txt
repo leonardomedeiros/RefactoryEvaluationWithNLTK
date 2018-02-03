@@ -1,0 +1,11 @@
+DECLARE @CreationDateStart datetime = ##CreationDateStart##
+DECLARE @CreationDateEnd datetime = ##CreationDateEnd##
+
+SELECT TOP 500 Posts.Id, Title, Comment, Score, Posts.CreationDate
+FROM Posts
+
+INNER JOIN PostHistory ON Posts.Id = PostHistory.PostId
+
+WHERE Posts.Title LIKE 'refactor%' and
+Comment is not null
+ORDER BY Score, ViewCount desc

@@ -1,0 +1,15 @@
+-- CreationDateStart =  '01/01/2014'
+-- CreationDateEnd = '12/31/2014'
+DECLARE @CreationDateStart datetime = ##CreationDateStart##
+DECLARE @CreationDateEnd datetime = ##CreationDateEnd##
+
+SELECT TOP 500 Posts.Id, Title, Comment, Score, Posts.CreationDate
+FROM Posts
+
+INNER JOIN PostHistory ON Posts.Id = PostHistory.PostId
+
+WHERE Title Is not null and
+Comment LIKE 'refactor%' and
+Posts.CreationDate >= @CreationDateStart and
+Posts.CreationDate <= @CreationDateEnd
+ORDER BY Score, ViewCount

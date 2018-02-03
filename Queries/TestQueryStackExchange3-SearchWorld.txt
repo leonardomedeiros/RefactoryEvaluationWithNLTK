@@ -1,0 +1,17 @@
+DECLARE @CreationDateStart datetime = ##CreationDateStart##
+DECLARE @CreationDateEnd datetime = ##CreationDateEnd##
+DECLARE @SearchWorld varchar(30)  = ##SearchWord##
+
+SELECT TOP 500 Posts.Id, Title, Score, Body, CreationDate
+FROM Posts
+
+--INNER JOIN PostHistory ON Posts.Id = PostHistory.PostId
+
+WHERE 
+--Posts.Body LIKE 'refactor%' and
+Posts.CreationDate >= @CreationDateStart and
+Posts.CreationDate <= @CreationDateEnd and
+
+CONTAINS(Body, @SearchWord);  
+
+ORDER BY Score DESC

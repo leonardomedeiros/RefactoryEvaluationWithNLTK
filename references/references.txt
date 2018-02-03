@@ -18,3 +18,25 @@ GitHub Code
 --------
 https://github.com/tensorflow/workshops/tree/master/extras/keras-bag-of-words
 =============================================================
+
+
+
+Dados do Stack Overflow
+Como consultar conjuntos de dados públicos usando o BigQuery
+---------------------------------------------------------------
+https://cloud.google.com/bigquery/public-data/stackoverflow
+
+ O BigQuery é um armazém de dados totalmente gerenciado e uma plataforma analítica. Os conjuntos de dados públicos estão disponíveis para análise usando consultas SQL. Você pode acessá-los usando a IU da Web, a ferramenta de linha de comando ou fazendo chamadas à BigQuery REST API com várias bibliotecas cliente, como Java, .NET ou Python.
+
+Para começar a usar um conjunto de dados público do BigQuery, crie ou selecione um projeto. O primeiro terabyte de dados processados por mês é gratuito. Dessa forma, você pode começar a consultar conjuntos de dados públicos sem ativar o faturamento. Se quiser ir além do nível gratuito, será necessário ativar o faturamento.
+--
+ps: Pode ser pago....
+ps2: Avaliar versão gratuira :p
+
+----
+Avaliação:
+A base de dados não existe mais. No entanto, existe acesso em: https://data.stackexchange.com/stackoverflow/query/new. Tutorial em:
+https://data.stackexchange.com/tutorial
+
+
+=======

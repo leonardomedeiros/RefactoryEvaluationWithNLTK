@@ -1,0 +1,936 @@
+Id,Title,Score,Body,CreationDate
+"25424074","refactor large AngularJS module config into separate files","15","<h3>Problem: Large <code>config()</code></h3>
+
+<p>The config of my AngularJS app is growing quite large. How would you refactor the following into separate files?</p>
+
+<pre><code>// app.js
+angular.module('myApp')
+    .config(function($urlRouterProvider, $stateProvider, $httpProvider) {
+        // Configure routing (uiRouter)
+        $urlRouterProvider.when('/site', '/site/welcome');
+        $stateProvider.state('main', ...
+        ...
+
+        // Configure http interceptors
+        $httpProvider.interceptors.push(function () {              
+            ...
+        });
+    });
+</code></pre>
+
+<hr>
+
+<h3>Option 1. Multiple <code>config()</code>s</h3>
+
+<p>I know that I can have multiple <code>config()</code>s and place them in separate files like this:</p>
+
+<pre><code>// app.js
+angular.module('myApp');
+
+// routerConfiguration.js
+angular.module('myApp')
+    .config(function($urlRouterProvider, $stateProvider) {
+        // Configure routing (uiRouter)
+        $urlRouterProvider.when('/site', '/site/welcome');
+        $stateProvider.state('main', ...
+        ...
+
+// httpInterceptorConfig.js
+angular.module('myApp')
+    .config(function($httpProvider) {
+        // Configure http interceptors
+        $httpProvider.interceptors.push(function () {              
+            ...
+        });
+    });
+</code></pre>
+
+<p>What I do not like about this, is that in the original app.js, <strong>there is no way of getting an overview</strong> of what is run at startup. </p>
+
+<hr>
+
+<h3>Option 2. Inject something</h3>
+
+<p>I would prefer to do something like this, because it would be easier to see what is configured, directly in the app.js. However I know that this is not possible, since we cannot inject services into <code>config()</code>. </p>
+
+<p><strong>Can I use providers to solve this? Is there a better way?</strong></p>
+
+<pre><code>// app.js
+angular.module('myApp')
+    .config(function(routerConfig, httpInterceptorConfig) {
+        routerConfig.setup();
+        httpInterceptorConfig.setup();
+    });
+
+// routerConfig.js
+angular.module('myApp')
+    .factory('routerConfig', function($urlRouterProvider, $stateProvider) {
+        return {
+            setup: function() {
+                // Configure routing (uiRouter)
+                $urlRouterProvider.when('/site', '/site/welcome');
+                $stateProvider.state('main', ...
+                ...
+            }
+        };
+    });
+});
+
+// httpInterceptorConfig.js
+angular.module('myApp')
+    .factory('httpInterceptorConfig', function($httpProvider) {
+        return {
+            setup: function() {
+                // Configure http interceptors
+                $httpProvider.interceptors.push(function () {              
+                ...
+            }
+        };
+    });
+});
+</code></pre>
+","2014-08-21 10:31:43"
+"26266552","refactoring Ruby scraping code","1","<p>Basically, I will have multiple <code>.main_entry</code> blocks on each page and I will need to pull a couple of pieces of data from each. How can this be properly refactored into methods? </p>
+
+<pre><code>require 'open-uri'
+require 'nokogiri'
+
+
+url = #url
+doc = Nokogiri::HTML(open(url))
+
+doc.css("".main_entry"").each do |item|
+  artist = item.at_css("".list_artist"").text
+  title = item.at_css("".list_album"").text
+  puts ""#{artist} - #{title}""
+end
+</code></pre>
+
+<p>I have arrived at this mess below, which throws the <code>undefined local variable or method 'release'</code> error that seems to be related to methods being over-written. Could you explain to me what process the code below goes through, why it breaks down and what I should turn to for the fix? Should each <code>.main_entry</code> block be saved into some kind of a cache or an array first, before instantiating? </p>
+
+<pre><code>require 'open-uri'
+require 'nokogiri'
+
+class Scraper
+  def initialize(url)
+    @url = url
+  end
+
+  def release
+    @release ||= doc.css("".main_entry"") || []
+  end
+
+  release.each do |item|
+    define_method(:artist) do
+      @artist ||= item.at_css("".list_artist"").text
+    end
+
+    define_method(:title) do
+      @title ||= item.at_css("".list_album"").text
+    end
+  end
+
+  private
+  attr_reader :url
+
+  def doc
+    @doc ||= Nokogiri::HTML(open(url))
+  end
+end
+
+scraper = Scraper.new( #url
+
+puts ""#{scraper.artist} - #{scraper.title}""
+</code></pre>
+","2014-10-08 21:13:09"
+"23414508","refactor rails controller that has many query parameters?","1","<p>I have a rails controller show action which shows either the parents teams of a team, the child teams of a team, or the full family tree. Currently I am doing this as a simple case statement. Is this the correct ""rails"" way to do it or should I refactor? If yes, any suggestions on how would be appreciated.</p>
+
+<pre><code>if @team= fetch_team
+  case params[:tree]
+  when 'parents'
+    @output = @team.ancestor_ids
+  when 'children'
+    @output = @team.child_ids
+  when 'full'
+    @output = @team.full_tree
+  when nil
+    @output = fetch_team
+  else
+    @output = {message: ""requested query parameter: '#{params[:tree]}' not defined""}
+  end
+
+  render json: @output
+else
+  render json: {message: ""team: '#{params[:id]}' not found""}, status: 404
+end
+
+##
+
+def fetch_team
+ Team.find_by(name: params[:id])
+end
+</code></pre>
+","2014-05-01 18:54:32"
+"25504751","refactor legacy python code: from u'...' to '...'","1","<p>I have a legacy code project which uses a lot of unicode strings like this: <code>u'...'</code></p>
+
+<p>I want to update the code to use <code>from __future__ import unicode_literals</code></p>
+
+<p>Any automated help from pycharm or an other tool?</p>
+
+<p><strong>Update</strong></p>
+
+<p>A simple search+replace does not work, since the code could contain strings like <code>'fuu'</code> and I don't want that to be replace to <code>'fu'</code>.</p>
+","2014-08-26 11:28:58"
+"21571197","refactoring input check for hangman in java with acm","1","<p>I'm taking an online java course using the acm package, so the following syntax may not be ""orthodox java"".  At any rate, hopefully, the point I'm making here comes through to those familiar with the package and otherwise:</p>
+
+<p>The code I have below works for validating user input for a game of hangman in java, but going in, I was sure that I could do this with simply one if else statement, but ultimately for expediency's sake, I settled for adding a nested if, else statement.  It's really bugging me that I can't figure out how to refactor this code in one if else statement as I'm positive that there is at least one very obvious way to do this.  Any help would be much appreciated!</p>
+
+<pre><code>private void turn()
+{
+    println(""The word now looks like this: "" + currentWord);
+    println(""You have "" + guessesLeft + "" guesses left."");
+    currentGuess = readLine(""Your guess: "");
+
+    String temp = currentWord;
+
+    /*test for legality of guess
+     * 1) is it exactly 1 char long?(ie not blank nor a long string
+     * 2) is it a letter?
+     */
+    if(currentGuess.length() == 0)
+    {
+        println(""That is an illegal guess."");
+    }
+    else{
+        char guessedLetter = Character.toUpperCase(currentGuess.charAt(0));
+
+        if(currentGuess.length() != 1 || !Character.isLetter(guessedLetter))
+        {
+            println(""That is an illegal guess."");
+        }
+        else{
+        /*scan through secret word to find a match between
+         * entered guess and secret word
+         */ ......}
+
+private String currentGuess;
+private String currentWord;
+</code></pre>
+","2014-02-05 07:33:26"
+"26717938","refactoring repetitive sass to modify based on immediate parent's class","0","<p>tldr: how to avoid repetition of "".well"" selector in below example.</p>
+
+<p>I am using bootstrap and sass to display a ""well"" div with a shape and with a gradient fill. This may not be a proper use of wells and I'd welcome other suggestions as to how to draw circular/rectangular divs with X% shaded (ideally where X is any integer. [0, 100]) but, for now, I am most interested in whether it's possible in SASS to get rid of the repetition of "".well"". I tried using ""&amp;"" but it would reverse .some_container too and I only wanted to reverse the immediate .inner_container parent to apply there (e.g. .inner_container.round). [There is one outer_container and multiple inner_containers. Each inner_container has one well.]</p>
+
+<pre><code>.outer_container {
+  .inner_container {
+    &amp;.round .well {
+      border-radius: 50%;
+    }
+
+    &amp;.barely_filled .well {
+      @include gradient-horizontal(sienna, $well-bg, 0%, 25%);
+    }
+
+    &amp;.half_filled .well {
+      @include gradient-horizontal(sienna, $well-bg, 0%, 50%);
+    }
+
+    &amp;.fairly_filled .well {
+      @include gradient-horizontal(sienna, $well-bg, 0%, 75%);
+    }
+
+    &amp;.mostly_filled .well {
+      background-color: sienna;
+    }
+  }
+}
+</code></pre>
+","2014-11-03 15:56:11"
+"27279292","refactor method name in eclipse from linked project","0","<p>I have 6 java projects in my Eclipse IDE (juno). One of them is a dummy project which is not meant to be compiled or deployed, it simple holds common logic for the other projects. The other projects use this common project. I edited the classpath of the other projects to include the common source folder as a linked source.</p>
+
+<p>This works fine, but I'm having troubles when I refactor a class or method name in the common project. The refactoring is not propagated to the non-common classes in the other projects that makes use of the refactored class or method, resulting in compile errors that a certain class or method is not found.</p>
+
+<p>The only way I can deal with this is either: </p>
+
+<ol>
+<li>Don't change the name of anything</li>
+<li>Manually change the name in all projects after refactoring</li>
+</ol>
+
+<p>This kind of defeats the purpose of having the common source if a simple edit is not propagated. Is there any way of dealing with this?</p>
+","2014-12-03 18:44:20"
+"21403084","refactoring large if else satement in java","0","<p>I'm trying to refactor some code so I don't have a large if / else if statement if possible. </p>
+
+<p>Here is the code: </p>
+
+<pre><code>if (Character.getNumericValue(num) == 0 ) {
+        return bar0;
+    }
+    else if (Character.getNumericValue(num) == 1 ) {
+        return bar1;
+    }
+    else if (Character.getNumericValue(num) == 2 ) {
+        return bar2;
+    }
+    else if (Character.getNumericValue(num) == 3 ) {
+        return bar3;
+    }
+    else if (Character.getNumericValue(num) == 4 ) {
+        return bar4;
+    }
+    else if (Character.getNumericValue(num) == 5 ) {
+        return bar5;
+    }
+    else if (Character.getNumericValue(num) == 6 ) {
+        return bar6;
+    }
+    else if (Character.getNumericValue(num) == 7 ) {
+        return bar7;
+    }
+    else if (Character.getNumericValue(num) == 8 ) {
+        return bar8;
+    }
+    else if (Character.getNumericValue(num) == 9 ) {
+        return bar9;
+    }
+    else {
+        return bar10;
+    }
+</code></pre>
+
+<p>Basically it checks if char num is equal to an int 0-9, then returns the associated numbers bar (which is of type string). Is there any way to make this better?</p>
+
+<p>I would like it to be something like </p>
+
+<pre><code>if (Character.getNumericaValue(num) == x {
+   return barx;
+}
+else 
+   return bar10;
+</code></pre>
+
+<p>if that makes sense. </p>
+","2014-01-28 10:31:07"
+"26888774","refactor the rspec tests","0","<p>I have written a unit tests as below.</p>
+
+<pre><code>describe Youtube::Metadata do
+  let(:subject) { SampleMetadata.from_text(open(url)) }
+  context ""when url is passed"" do
+    let(:url) { ""http://www.sample.com"" }
+
+    describe ""It should return all values from the site"" do
+      its(:id) { should eql ""234"" }
+      its(:url) { should eql ""www.sample.com"" }
+    end
+
+    context ""Given a html file with id property"" do
+      let(:html) { File.join(PAGES, 'youtube', 'sample1.html') }
+      let(:subject) { Youtube::Metadata.from_text(File.read(html)) }
+
+      it ""should return unique value from id property"" do
+        subject.unique_id.should eql ""65155c6e-ba11-42fc-bb91-53520176d2a8""
+      end
+    end
+
+    context ""Given a html file with rel:canonical property"" do
+      let(:html) { File.join(PAGES, 'youtube', 'sample2.html') }
+      let(:subject) { Youtube::Metadata.from_text(File.read(html)) }
+
+      it ""should return unique value from rel=canonical content property"" do
+        subject.unique_id.should eql ""65155c6e-ba11-42fc-bb91-53520176d2a8""
+      end
+    end
+  end
+end
+</code></pre>
+
+<p>I need to refactor it so that I dont have to repeat the below statement in each and every tests cases.</p>
+
+<pre><code>let(:subject)   { Youtube::Metadata.from_text(File.read(html))
+</code></pre>
+
+<p>I tried it with before block but it didn't work.  </p>
+
+<blockquote>
+  <p>Actually the first context we pass url and the second set of context
+  we pass filename. Also I am not sure whether I need to make it as a
+  single context (which is passing file name contexts, ie. last two) and describe it.</p>
+</blockquote>
+
+<p>What would be the right way to do it??</p>
+","2014-11-12 14:00:09"
+"22691648","refactoring code that contains ""button addTarget""","0","<p>I have a lot of places of a code that changes a view in UINavigationBar.<br>
+So the code is something like this:</p>
+
+<pre><code>UIButton *butt2=[UIButton buttonWithType:UIButtonTypeCustom ];
+
+[butt2 setFrame:CGRectMake(285, 7, 30, 25)];
+[butt2 setTag:2];
+[butt2 setImage:[UIImage imageNamed:@""tag_icon.png""] forState:UIControlStateNormal];
+[butt2 addTarget:self action:@selector(revealMenu:) forControlEvents:UIControlEventTouchDown];
+[self.navigationController.navigationBar addSubview:butt2] ;
+</code></pre>
+
+<p>I want to create a method that gets argument of the different things in the code which is:<br>
+1. the image (easy)<br>
+2. The action of the button - <strong>AHA! This one I couldn't figure out how to do</strong></p>
+","2014-03-27 15:07:09"
+"25110150","refactoring my rails code (model method)","0","<p>So this works fine, it's just I need some refactoring done. What I want to achieve is, get all the values for the current record or just put another column (calculated column, like in SQL) that'll hold all the values for all of my fields that starts with ""address"".</p>
+
+<p>So far, this is what I have.</p>
+
+<p>Thanks for any input. Also, if possible, do not post the actual refactored code, but just let me know what I should be reading or just hints. I prefer achieving this on my own. Thanks again.</p>
+
+<pre><code>  def address
+    ""#{self[:address_street1]} #{self[:address_street2]} #{self[:address_city]} #{self[:address_state]} #{self[:address_zipcode]} #{self[:address_country]}""
+  end
+</code></pre>
+","2014-08-03 23:50:40"
+"25973785","refactor method with two foreach loops","0","<p>I run into refactoring problem. I have many similar methods, but i cannot find way to extract one line form them and make another private method.</p>
+
+<pre><code>private function constructRules($rules, \Languages $langs) {
+    foreach ($rules as $fieldType =&gt; $rule) {
+        foreach ($langs-&gt;all() as $lang) {
+           //line below changes
+            $langRules[$fieldType . '[' . $lang-&gt;lang . ']'] = $rule; 
+        }       
+    }
+
+    return $langRules;
+}
+</code></pre>
+
+<p>I have these foreach loops in 4 different places. If i extact foreach loops and return array, I still need to make one foreach loop in method, to fill $langRules in this example. Maybe there are simple way to do it, but I am not able to see it...</p>
+","2014-09-22 12:08:52"
+"25268847","refactoring code with conditional return","0","<p>I have this code on my project in the begining of multiple functions.</p>
+
+<pre><code>try: 
+    user = get_user(user_id) 
+except LockedException: 
+    logger.warn('op=healthcheck, msg=""user is locked""') 
+    return HttpResponseServerError(jsonMessage('user=%(user)s is locked' % {'user': user_id})) 
+except UserFreeException: 
+    logger.warn('op=user, msg=""user is free""') 
+    return HttpResponseNotFound(jsonMessage('user is free user=%(user)s' % {'user': user_id})) 
+except User.DoesNotExist: 
+    logger.warn('op=healthcheck, msg=""user doesn\'t exist""') 
+    return HttpResponseNotFound(jsonMessage('invalid user=%(user)s' % {'user': user_id})) 
+except Exception, e: 
+    logger.error('op=healthcheck, msg=""unknown error"", msg=""%(exception)s""', 
+                 {'exception': e.message}) 
+    return HttpResponseServerError(jsonMessage(e.message)) 
+</code></pre>
+
+<p>Any hints on how can I refactor it so I don't need to reuse it everywhere?
+The best I could come would be to create a function that throws a single exception in case of a problem, and this exception contains a ""http_response"" field, so I'd do something like:</p>
+
+<pre><code>try:
+    user = get_user(user_id)
+except MyGenericException, e:
+    return e.http_response
+</code></pre>
+
+<p>Any other ideas?</p>
+","2014-08-12 15:55:25"
+"24021316","refactoring top-level transforms","0","<p>I have a stylesheet with a number of templates that match certain elements, including an identity template:</p>
+
+<pre><code>&lt;xsl:stylesheet&gt;
+    &lt;xsl:template match=""@*|node()""&gt;
+        &lt;xsl:copy&gt;
+            &lt;xsl:apply-templates select=""@*|node()"" /&gt;
+        &lt;/xsl:copy&gt;
+    &lt;/xsl:template&gt;
+    &lt;xsl:template match=""someElement/*&gt;
+    ...
+    &lt;/xsl:template&gt;
+    &lt;!-- a bunch of other matching templates --&gt;
+&lt;/xsl:stylesheet&gt;
+</code></pre>
+
+<p>A new requirement has come up that if a certain element in the input document has a specific value, most of the transformation should simply be skipped.</p>
+
+<p>Of course I <em>can't</em> simply do this:</p>
+
+<pre><code>&lt;xsl:stylesheet&gt;
+    &lt;xsl:choose&gt;
+        &lt;xsl:when test=""/someElement/somethingElse &amp;lt; 0""&gt;
+            &lt;xsl:template match=""@*|node()""&gt;
+                &lt;xsl:copy&gt;
+                    &lt;xsl:apply-templates select=""@*|node()"" /&gt;
+                &lt;/xsl:copy&gt;
+            &lt;/xsl:template&gt;
+
+            &lt;xsl:template match=""someElement/*&gt;
+            ...
+            &lt;/xsl:template&gt;
+            &lt;!-- a bunch of other matching templates --&gt;
+        &lt;/xsl:when&gt;
+        &lt;xsl:otherwise&gt;
+            &lt;!-- do very simple transform --&gt;
+        &lt;/xsl:otherwise&gt;
+    &lt;xsl:choose&gt;
+&lt;/xsl:stylesheet&gt;
+</code></pre>
+
+<p>because <code>template</code> is not allowed as a child of <code>when</code>. It looks like the only way to deal with this might be to rewrite all of the templates with actual names and parameters, but there are quite a few and I was wondering if there was an easier way.</p>
+","2014-06-03 17:23:49"
+"27387799","refactor large switch-statement","0","<p>Any suggestions for refactoring this ugly case-switch into something more elegant?</p>
+
+<p>This method (in Ruby) returns a (short or full) description for Belgian provinces, given a zipcode.</p>
+
+<pre><code>def province(zipcode, short = false)
+  case zipcode
+  when 1000...1300
+    short ? 'BXL' : 'Brussel'
+  when 1300...1500
+    short ? 'WBR' : 'Waals-Brabant'
+  when 1500...2000, 3000...3500
+    short ? 'VBR' : 'Vlaams-Brabant'
+  when 2000...3000
+    short ? 'ANT' : 'Antwerpen'
+  when 3500...4000
+    short ? 'LIM' : 'Limburg'
+  when 4000...5000
+    short ? 'LIE' : 'Luik'
+  when 5000...6000
+    short ? 'NAM' : 'Namen'
+  when 6000...6600, 7000...8000
+    short ? 'HAI' : 'Henegouwen'
+  when 6600...7000
+    short ? 'LUX' : 'Luxemburg'
+  when 8000...9000
+    short ? 'WVL' : 'West-Vlaanderen'
+  when 9000..9999
+    short ? 'OVL' : 'Oost-Vlaanderen'
+  else
+    fail ArgumentError, 'Not a valid zipcode'
+  end
+end
+</code></pre>
+
+<p>Based on suggestions from MiiinimalLogic i made a second version. It this preferable?</p>
+
+<pre><code>class Provincie
+  ProvincieNaam = Struct.new(:kort, :lang)
+
+  PROVINCIES = {
+    1000...1300 =&gt; ProvincieNaam.new('BXL', 'Brussel'),
+    1300...1500 =&gt; ProvincieNaam.new('WBR', 'Waals-Brabant'),
+    1500...2000 =&gt; ProvincieNaam.new('VBR', 'Vlaams-Brabant'),
+    2000...3000 =&gt; ProvincieNaam.new('ANT', 'Antwerpen'),
+    3000...3500 =&gt; ProvincieNaam.new('VBR', 'Vlaams-Brabant'),
+    3500...4000 =&gt; ProvincieNaam.new('LIM', 'Limburg'),
+    4000...5000 =&gt; ProvincieNaam.new('LIE', 'Luik'),
+    5000...6000 =&gt; ProvincieNaam.new('NAM', 'Namen'),
+    6000...6600 =&gt; ProvincieNaam.new('HAI', 'Henegouwen'),
+    6600...7000 =&gt; ProvincieNaam.new('LUX', 'Luxemburg'),
+    7000...8000 =&gt; ProvincieNaam.new('HAI', 'Henegouwen'),
+    8000...9000 =&gt; ProvincieNaam.new('WVL', 'West-Vlaanderen'),
+    9000..9999  =&gt; ProvincieNaam.new('OVL', 'Oost-Vlaanderen')
+  }.freeze
+
+  def self.lang(postcode)
+    provincie_naam(postcode).lang
+  end
+
+  def self.kort(postcode)
+    provincie_naam(postcode).kort
+  end
+
+  def self.provincie_naam(postcode)
+    PROVINCIES.each { |list, prov| return prov if list.cover?(postcode) }
+    fail ArgumentError, 'Geen geldige postcode'
+  end
+
+  private_class_method :provincie_naam
+end
+</code></pre>
+","2014-12-09 20:04:26"
+"21540479","refactor javascript to an external file","0","<p>I am beginner in ASP .Net and JQuery. So forgive me for asking this silly question. I have an <code>Index.cshtml</code> file as follows. I am using Highcharts' example code to make a gauge. My problem is: the code  between <code>&lt;script&gt;&lt;/script&gt;</code> are long and messy, how can I make it more compact? 
+I have tried to move it to an external file, <code>myscript.js</code>, inside the Scripts folder and include a line <code>&lt;script src=""Scripts/myscript.js""&gt;&lt;/script&gt;</code> in <code>Index.cshtml</code> but it give me error saying $ is undefined, which I suspect may be due to the external myscript.js loading before the DOM is finished in the browser. I have tried putting the code in the _layout.cshtml but that is not pretty either. Thank you for your help.</p>
+
+<pre><code>@model IEnumerable&lt;WebApplication16.Models.BatteryLog&gt;
+
+@{
+    ViewBag.Title = ""Index"";
+}
+@{
+    Layout = ""~/Views/Shared/_Layout.cshtml"";
+}
+&lt;script&gt;$(function () {
+
+    $('#gauge').highcharts({
+
+        chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+
+        title: {
+            text: 'Current'
+        },
+
+        pane: {
+            startAngle: -150,
+            endAngle: 150,
+            background: [{
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#FFF'],
+                        [1, '#333']
+                    ]
+                },
+                borderWidth: 0,
+                outerRadius: '109%'
+            }, {
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#333'],
+                        [1, '#FFF']
+                    ]
+                },
+                borderWidth: 1,
+                outerRadius: '107%'
+            }, {
+                // default background
+            }, {
+                backgroundColor: '#DDD',
+                borderWidth: 0,
+                outerRadius: '105%',
+                innerRadius: '103%'
+            }]
+        },
+
+        // the value axis
+        yAxis: {
+            min: 0,
+            max: 200,
+
+            minorTickInterval: 'auto',
+            minorTickWidth: 1,
+            minorTickLength: 10,
+            minorTickPosition: 'inside',
+            minorTickColor: '#666',
+
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            tickColor: '#666',
+            labels: {
+                step: 2,
+                rotation: 'auto'
+            },
+            title: {
+                text: 'Volt'
+            },
+            plotBands: [{
+                from: 0,
+                to: 120,
+                color: '#55BF3B' // green
+            }, {
+                from: 120,
+                to: 160,
+                color: '#DDDF0D' // yellow
+            }, {
+                from: 160,
+                to: 200,
+                color: '#DF5353' // red
+            }]
+        },
+
+        series: [{
+            name: 'Current',
+            data: [80],
+            tooltip: {
+                valueSuffix: ' Volt'
+            }
+        }]
+
+    },
+    // Add some life
+    function (chart) {
+        if (!chart.renderer.forExport) {
+            setInterval(function () {
+                var point = chart.series[0].points[0],
+                    newVal,
+                    inc = Math.round((Math.random() - 0.5) * 20);
+
+                newVal = point.y + inc;
+                if (newVal &lt; 0 || newVal &gt; 200) {
+                    newVal = point.y - inc;
+                }
+
+                point.update(newVal);
+
+            }, 3000);
+        }
+    });
+});&lt;/script&gt;
+
+&lt;h2&gt;Index&lt;/h2&gt;
+&lt;div id=""gauge"" style=""min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto""&gt;&lt;/div&gt;
+</code></pre>
+","2014-02-04 00:08:09"
+"22236651","refactoring similar functions with access to variables","0","<p>I have a simple index page that allows you to click a button to change the colors displayed randomly on the background circle divs. The code I've written is working fine, but its really repetitive; I wrote a function for each button, and the functions look identical except for the variables they access.</p>
+
+<p>I'm trying to refactor this into a single function but can't figure out a way to allow the button that is click to access the correct variable to change the background colors. 
+For example here is the function for the first button, which accesses the colorList variable that changes the colors to gray spectrum:</p>
+
+<pre><code>var colorList1 = [//array of 20 colors]
+var colorList2 = [//array of 20 colors]
+var colorList3 = [//array of 20 colors]
+var colorList4 = [//array of 20 colors]
+
+// .choice-1 is the div class for the first button
+$("".choice-1"").on(""click"", function() {
+    blankSlate();
+    colorList = colorList1;
+    $(""[id^='nav']"").css(""background-color"", colorList[1]);
+    $(""#colorChoice"").css(""background-color"", colorList[1]);
+});
+</code></pre>
+
+<p>I tried to write something that would access the number in the class name and assign that to a variable that would be accessible to the main function doing something like this:</p>
+
+<pre><code>var buttonVar = $(""button"").attr[0].nodeValue; // get full name of nodeValue
+var btnChoice = buttonVar[buttonVar.length-1]; // access number at end of class name
+$(""button"").on(""click"",function() {
+    $('.choice' + btnChoice).on('click', function(){*/
+    blankSlate();
+    colorList = colorList + btnChoice;
+    $(""[id^='nav']"").css(""background-color"", colorList[btnChoice]);
+    $(""#colorChoice"").css(""background-color"", colorList[btnChoice]);
+  });
+</code></pre>
+
+<p>...but I'm not sure that this is the right way to go about it, and I'd love some advice about how this type of refactoring is typically handled. </p>
+
+<p>Here's a link to a Codepen showing how it works, and with all the html, css and remaining JS viewable. 
+<a href=""http://codepen.io/a6ftcruton/full/Beizu"" rel=""nofollow"">http://codepen.io/a6ftcruton/full/Beizu</a></p>
+","2014-03-06 21:41:44"
+"21327516","refactoring xsd elements with same elements?","0","<p>I have below xsd elements.</p>
+
+<pre><code> &lt;xsd:element name=""requestOne"" type=""tns:RequestOne""/&gt;
+  &lt;xsd:complexType name=""RequestOne""&gt;
+        &lt;xsd:annotation&gt;
+            &lt;xsd:documentation&gt;some comment&lt;/xsd:documentation&gt;
+        &lt;/xsd:annotation&gt;
+        &lt;xsd:sequence&gt;
+            &lt;xsd:element name=""id"" type=""xsd:string"" minOccurs=""1"" maxOccurs=""1""/&gt;
+        &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+
+   &lt;xsd:element name=""requestTwo"" type=""tns:RequestTwo""/&gt;
+  &lt;xsd:complexType name=""RequestTwo""&gt;
+        &lt;xsd:annotation&gt;
+            &lt;xsd:documentation&gt;other comment&lt;/xsd:documentation&gt;
+        &lt;/xsd:annotation&gt;
+        &lt;xsd:sequence&gt;
+            &lt;xsd:element name=""id"" type=""xsd:string"" minOccurs=""1"" maxOccurs=""1""/&gt;
+        &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+</code></pre>
+
+<p>It has two complex elements but inside them there is duplicated code. How can i refactor above code?</p>
+
+<p>Thanks!</p>
+","2014-01-24 08:09:33"
+"24403185","refactor code to avoid N+1 query","0","<p>I have my association like this</p>
+
+<p><code>models/transcription.rb</code></p>
+
+<pre><code>class Transcription &lt; ActiveRecord::Base
+  belongs_to :transcription_status, :class_name =&gt; ""TranscriptionStatus"",
+    :inverse_of =&gt; :transcriptions
+
+
+  # Initialize to ""new"" status if a status isn't already set
+  def setup_status
+    if transcription_status.nil?  # this method is taking lots of execution time ( N + 1 )
+      status = TranscriptionStatus.find_by_state(""new"")
+      if status
+        self.transcription_status = status
+      end
+    end
+  end
+end
+</code></pre>
+
+<p><code>models/transcription_status.rb</code></p>
+
+<pre><code>class TranscriptionStatus &lt; ActiveRecord::Base
+  has_many :transcriptions, :inverse_of =&gt; :transcription_status
+end
+</code></pre>
+
+<p><strong>Problem</strong></p>
+
+<p>Everytime I call <code>transcription_status</code> it is executing <code>N+1</code> query. Suggest me the way to refactor this code to prevent <code>N+1</code> query limit?</p>
+
+<p>Thanks</p>
+","2014-06-25 07:57:53"
+"23349464","refactoring tests that use assert_raises","0","<p>I have a test block:</p>
+
+<pre><code>describe 'without' do
+
+  describe 'author' do
+    let(:author)  {nil}
+    it('fails')   {assert_raises(ArgumentError) { excerpt }}
+  end
+
+  describe 'title' do
+    # same content as above, but testing title
+  end
+
+  describe 'content' do
+    # same content as above, but testing content
+  end
+
+end
+</code></pre>
+
+<p>This works fine and the tests pass - but since there's a lot of repetition here, I wanted to refactor:</p>
+
+<pre><code>describe 'without' do
+
+  describe 'author' do
+    let(:author)  {nil}
+    it('fails')   {assert_failure(excerpt} # added a method in this line
+  end
+
+  describe 'title' do
+    # same content as above, but testing title
+  end
+
+  describe 'content' do
+    # same content as above, but testing content
+  end
+
+  # and the method here
+  def assert_failure(instance)
+    assert_raises(ArgumentError) { instance }
+  end
+
+end
+</code></pre>
+
+<p>However this doesn't work - my tests fail with the following error:</p>
+
+<pre><code>construction::without::author#test_0001_fails:
+ArgumentError: Excerpt cannot be built: Author missing
+</code></pre>
+
+<p>Which is the error that I would expect to be raised with missing information - and is exactly what I'm testing.  So it seems that when this assertion is extracted, the <code>ArgumentError</code> is being raised and stopping the test before <code>assert_raises</code> can make any kind of comparison.  I looked into the <a href=""http://apidock.com/ruby/MiniTest/Assertions/assert_raises"" rel=""nofollow"">code</a> for this assertion, but I can't make out why this would happen when the code is extracted into another method, but not when it's in-line.  </p>
+","2014-04-28 19:19:48"
+"23475777","refactor node-mysql callback for KOA and co-mysql with generators","0","<p>I am doing queries like below in existings apps and would like some advice/example on how to refactor this for KOA + co-mysql with generators avoiding or simplifying the chained functions with the sql calls. JS is fine, of course, I use a nodejs 0.11 and a CS version that supports generators. Still trying to get the hang of the 'new way'.</p>
+
+<p>Thanks, K</p>
+
+<pre><code>client = mysql.createPool(mysql_options)
+getSql = (sql, callback) -&gt;
+  client.query sql, (err, rows, fields) -&gt;
+    if err  #mysql error handling
+      if err.code isnt 'PROTOCOL_CONNECTION_LOST'
+        console.log 'Mysql Error &lt;&gt; Conn.Lost: ',err.stack
+        process.on ""uncaughtException"", (err) -&gt;
+          console.log ""getSql Mysql Error Caught Exception: "", err.stack
+          return
+      else
+        setTimeout -&gt;
+          console.log 'Connection Lost; Re-connecting lost client (restart delay): ',err.stack
+          client = mysql.createPool(mysql_options)
+          return
+        , 700
+    client.release
+    callback rows
+
+    q10 = -&gt;         # and in the routes...
+      sql = ""select count(*) as custCount from cust01 where sessionid = '"" +  prSid + ""' and custNum = "" + ""'"" + sessionLoginUser + ""'""
+      getSql sql, (results) -&gt;
+        q20(results[0].custCount)
+
+    q20 = (custCount) -&gt;
+     ....etc etc
+
+    q10()
+</code></pre>
+","2014-05-05 15:05:55"
+"22118922","refactor IF...ELSE into Nested foreach to LINQ","0","<p>I am having troubles on finding a way to refactor my nested foreach code into a Linq, mostly because it includes an IF-Else clause into it.</p>
+
+<p>Below is a simplified version of my code. How do I include the IF..Else into a linq statement??</p>
+
+<p>I appreciate your suggestions.</p>
+
+<pre><code>List&lt;hierarchy&gt; PredomHierarchy;
+List&lt;hierarchy&gt; RecesesHierarchy;
+
+foreach x in PredomHierarchy{
+foreach y in RecesesHierarchy{  
+
+  if(x.name = y.name){      
+    Dosomething(x.name, y.name);                
+    } else {        
+    DosomethingElse(x.name, y.name);
+  }
+ }
+}
+</code></pre>
+","2014-03-01 19:02:49"
+"23745276","refactoring switch code in a Razor view page","-1","<p>I am trying to optimize the below asp.net mvc code by reusing image tag using a variable. Could some one throw idea on optimizing this code/ refactoring code  by adding variables and reusing img tag?</p>
+
+<pre><code>@model int
+
+@{
+    switch (Model)
+    {
+        case 0:
+        &lt;text&gt;
+            &lt;img title=""abc"" class=""Container"" src=""@Url.Content(Links.Content.Images.1_png)"" /&gt;
+        &lt;/text&gt;
+            break;
+        case 1:
+        &lt;text&gt;
+            &lt;img title=""def"" class=""Container"" src=""@Url.Content(Links.Content.Images.2_png)"" /&gt;
+        &lt;/text&gt;
+            break;
+        case 2:
+        &lt;text&gt;
+            &lt;img title=""ghi"" class=""Container"" src=""@Url.Content(Links.Content.Images.3_png)"" /&gt;
+        &lt;/text&gt;
+            break;
+        case 3:
+        &lt;text&gt;
+            &lt;img title=""jkl"" class=""Container"" src=""@Url.Content(Links.Content.Images.4_png)"" /&gt;
+        &lt;/text&gt;
+            break;
+    }   
+}
+</code></pre>
+","2014-05-19 19:01:53"
+"21719687","refactor regex ruby code","-2","<p>I want to get the resource name from a class name like:</p>
+
+<blockquote>
+  <p>""SequelAdapter::UserGraph""</p>
+</blockquote>
+
+<p>So I would want user in this case.</p>
+
+<p>Currently I have this code which does work but is very ugly:</p>
+
+<pre><code>klass = object.class.to_s
+
+if start = klass =~ /[::][A-Za-z]*Graph/
+  finish = klass =~ /Graph/
+
+  klass = klass[start + 1, finish - start - 1]
+end
+</code></pre>
+
+<p>Can anyone suggest a better way?</p>
+","2014-02-12 05:46:48"
