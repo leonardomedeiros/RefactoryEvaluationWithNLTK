@@ -1,3 +1,7 @@
+Instalação NLTK
+---------------
+https://pythonspot.com/en/tokenizing-words-and-sentences-with-nltk/
+
 -------------------------------------------------------------
 Google Cloud Big Data and Machine Learning Blog
 Innovation in data processing and machine learning technology
@@ -10,7 +14,13 @@ Friday, October 6, 2017
 
 Posted by Sara Robinson (Developer Advocate), Josh Gordon (Developer Advocate), and Marianne Linhares Monteiro (DA Intern).
 
-As humans, our brains can easily read a piece of text and extract the topic, tone, and sentiment. Up until just a few years ago, teaching a computer to do the same thing required extensive machine learning expertise and access to powerful computing resources. Now, frameworks like TensorFlow are helping to simplify the process of building machine learning models, and making it more accessible to developers with no background in ML.
+As humans, our brains can easily read a piece of text and extract the
+topic, tone, and sentiment. Up until just a few years ago, teaching a
+computer to do the same thing required extensive machine learning
+expertise and access to powerful computing resources. Now, frameworks
+like TensorFlow are helping to simplify the process of building
+machine learning models, and making it more accessible to developers
+with no background in ML.
 
 In this post, we’ll show you how to build a simple model to predict the tag of a Stack Overflow question. We’ll solve this text classification problem using Keras, a high-level API built in to TensorFlow.
 --------
@@ -40,3 +50,18 @@ https://data.stackexchange.com/tutorial
 
 
 =======
+
+https://towardsdatascience.com/understanding-feature-engineering-part-3-traditional-methods-for-text-data-f6f7d70acd41
+
+In this scenario, we are talking about free flowing text in the form of words, phrases, sentences and entire documents. Essentially, we do have some syntactic structure like words make phrases, phrases make sentences which in turn make paragraphs. However, there is no inherent structure to text documents because you can have a wide variety of words which can vary across documents and each sentence will also be of variable length as compared to a fixed number of data dimensions in structured datasets. This article itself is a perfect example of text data!
+
+https://github.com/dipanjanS/practical-machine-learning-with-python/blob/master/bonus%20content/feature%20engineering%20text%20data/Feature%20Engineering%20Text%20Data%20-%20Traditional%20Strategies.ipynb
+
+--Muito bom!
+=======
+LER!!
+http://www.nltk.org/book/
+
+
+https://pythonspot.com/en/tokenizing-words-and-sentences-with-nltk/ (1)
+https://pythonspot.com/nltk-stop-words/ (2)
