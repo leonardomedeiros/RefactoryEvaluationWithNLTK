@@ -1,19 +1,25 @@
--- CreationDateStart =  '01/01/2007'
+-- CreationDateStart =  '06/01/2017'
 -- CreationDateEnd = '12/31/2017'
--- Searchword = 'refactor%'
+-- Searchword = '%refactor%'
 DECLARE @CreationDateStart datetime = ##CreationDateStart##
 DECLARE @CreationDateEnd datetime = ##CreationDateEnd##
-DECLARE @SearchWord varchar(30)  = ##SearchWord##
+DECLARE @SearchWord nvarchar(30) = ##SearchWord##
 
-SELECT TOP 500 Posts.Id, Title, Score, PostHistory.Text, PostHistory.CreationDate
+SELECT
+Id,
+CreationDate,
+Title,
+Score,
+Tags,
+Body
 FROM Posts
-
-INNER JOIN PostHistory ON Posts.Id = PostHistory.PostId
-
 WHERE 
---Posts.Body LIKE 'refactor%' and
-Posts.CreationDate >= @CreationDateStart and
-Posts.CreationDate <= @CreationDateEnd and
-Posts.Title like @SearchWord
---Body like @SearchWord
+CreationDate >= @CreationDateStart and
+CreationDate <= @CreationDateEnd and
+(
+ Title like @SearchWord or
+ Body Like @SearchWord or
+ Tags Like @SearchWord
+)
 ORDER BY Score DESC
+
