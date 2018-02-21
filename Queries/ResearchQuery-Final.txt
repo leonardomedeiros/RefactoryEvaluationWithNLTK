@@ -21,5 +21,6 @@ CreationDate <= @CreationDateEnd and
  Body Like @SearchWord or
  Tags Like @SearchWord
 )
-ORDER BY Score DESC
+AND ParentId IS NULL
+ORDER BY Score
 

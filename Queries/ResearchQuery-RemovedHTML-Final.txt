@@ -7,11 +7,11 @@ DECLARE @SearchWord nvarchar(30) = ##SearchWord##
 
 SELECT
 Posts.Id,
+Posts.ParentId,
 Title,
 Score,
 Tags,
-Text,
-PostHistory.CreationDate
+Text
 FROM Posts
 INNER JOIN PostHistory ON Posts.Id = PostHistory.PostId
 WHERE 
@@ -22,5 +22,5 @@ Posts.CreationDate <= @CreationDateEnd and
  Body Like @SearchWord or
  Tags Like @SearchWord
 ) 
-and PostHistoryTypeId = '2'
+and PostHistoryTypeId = '2' AND Posts.ParentId IS NULL
 ORDER BY Score DESC
